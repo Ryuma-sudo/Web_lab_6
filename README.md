@@ -41,6 +41,7 @@ This section details how the system handles a user attempting to log in.
     * **Failure:** Returns to login with an error message.
 * Admin
 <img width="3071" height="1166" alt="image" src="https://github.com/user-attachments/assets/54fee7a3-bec1-4927-8f93-fe71f03e9d8f" />
+
 * User
 <img width="3069" height="1142" alt="image" src="https://github.com/user-attachments/assets/ff417348-af5a-4607-90d7-9719e0ced51b" />
 
@@ -66,6 +67,7 @@ This flow explains how the system ensures only logged-in users can access protec
     2.  The View renders the "Add New Student" button only if `sessionScope.role == 'admin'`.
 * Admin
 <img width="1969" height="532" alt="image" src="https://github.com/user-attachments/assets/91a1113d-3936-4e26-92e8-e93c1b3f3945" />
+
 * User
 <img width="1935" height="512" alt="image" src="https://github.com/user-attachments/assets/d9d2c9d1-cd3d-4d86-ae6c-81522a2c2d65" />
 
