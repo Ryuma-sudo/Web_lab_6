@@ -39,11 +39,6 @@ This section details how the system handles a user attempting to log in.
 * **Action:**
     * **Success:** Creates `HttpSession`, stores `User` object, and redirects to `/dashboard`.
     * **Failure:** Returns to login with an error message.
-* Admin
-<img width="3071" height="1166" alt="image" src="https://github.com/user-attachments/assets/54fee7a3-bec1-4927-8f93-fe71f03e9d8f" />
-
-* User
-<img width="3069" height="1142" alt="image" src="https://github.com/user-attachments/assets/ff417348-af5a-4607-90d7-9719e0ced51b" />
 
 ---
 
@@ -66,10 +61,10 @@ This flow explains how the system ensures only logged-in users can access protec
     1.  The Controller fetches statistics (e.g., `totalStudents`) and forwards to the View.
     2.  The View renders the "Add New Student" button only if `sessionScope.role == 'admin'`.
 * Admin
-<img width="1969" height="532" alt="image" src="https://github.com/user-attachments/assets/91a1113d-3936-4e26-92e8-e93c1b3f3945" />
+<img width="3071" height="1166" alt="image" src="https://github.com/user-attachments/assets/54fee7a3-bec1-4927-8f93-fe71f03e9d8f" />
 
 * User
-<img width="1935" height="512" alt="image" src="https://github.com/user-attachments/assets/d9d2c9d1-cd3d-4d86-ae6c-81522a2c2d65" />
+<img width="3069" height="1142" alt="image" src="https://github.com/user-attachments/assets/ff417348-af5a-4607-90d7-9719e0ced51b" />
 
 ---
 
@@ -140,4 +135,42 @@ Before updating, the system must verify the user's identity again.
 
 <img width="1079" height="1087" alt="image" src="https://github.com/user-attachments/assets/4465dc3c-39f0-4cb3-a394-aa64ae45f3ac" />
 <img width="1087" height="1099" alt="image" src="https://github.com/user-attachments/assets/490daea2-69f1-4d58-b2b7-0bcf3ed710f2" />
+
+---
+
+## 5. ADMIN AUTHORIZATION FLOW (EXERCISE 6)
+This section details how the `AdminFilter` protects sensitive operations (Create, Update, Delete) from unauthorized access.
+
+### **Scenario:**
+A user attempts to perform a restricted action, such as **Deleting a Student**.
+* **URL:** `http://localhost:8080/StudentManagementMVC/student?action=delete&id=1`
+
+### **Step 1: Request Interception (Filter Layer)**
+* **File:** `AdminFilter.java`
+* **Method:** `doFilter(ServletRequest request, ...)`
+* **Action:**
+    1.  The filter intercepts **every request** sent to the `/student` URL pattern.
+    2.  It retrieves the `action` parameter from the request (e.g., `action="delete"`).
+
+### **Step 2: Action Classification**
+* **Logic:** The filter checks if the requested action is in the restricted `ADMIN_ACTIONS` list (new, insert, edit, update, delete).
+    * `isAdminAction("delete")` returns **true**.
+    * `isAdminAction("list")` returns **false**.
+
+### **Step 3: Permission Verification**
+If the action is restricted, the filter performs a deep check:
+* **Action:**
+    1.  Retrieves the current `HttpSession`.
+    2.  Gets the `User` object: `User user = (User) session.getAttribute("user");`
+    3.  Checks the role: `user.isAdmin()`.
+
+### **Step 4: Access Decision**
+* **Case A: User is Admin**
+    * **Result:** `chain.doFilter(request, response)` is called.
+    * **Outcome:** The request proceeds to `StudentController`, and the student is deleted.
+
+* **Case B: User is NOT Admin (e.g., John)**
+    * **Result:** The request is blocked immediately.
+    * **Outcome:** The user is redirected to the student list with an error message:
+      `response.sendRedirect(".../student?action=list&error=Access Denied!...")`
 
