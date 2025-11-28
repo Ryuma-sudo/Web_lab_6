@@ -91,8 +91,53 @@ This flow details how the system securely terminates a user session.
 
 ---
 
-## 4. SYSTEM ARCHITECTURE DIAGRAM
-*Visual representation of the MVC flow implemented in Part A.*
+## 4 CHANGE PASSWORD FLOW 
 
-**[PLACEHOLDER: INSERT YOUR MVC ARCHITECTURE DIAGRAM HERE]**
-*(Tip: You can draw a simple diagram showing: Browser -> LoginController -> UserDAO -> Database)*
+This section details the secure process of updating a user's password, ensuring properly validtion and hashing.
+
+### **Step 1: Access & Form Display (GET Request)**
+
+  * **Action:** User clicks "Change Password" on the Navbar.
+  * **Controller:** `ChangePasswordController.doGet()` checks if the user is logged in.
+      * If not logged in: Redirects to `/login`.
+      * If logged in: Forwards to the view `change-password.jsp`.
+  * **View:** Displays a form requiring Current Password, New Password, and Confirm Password.
+
+<img width="1097" height="997" alt="image" src="https://github.com/user-attachments/assets/5852aa0a-a4d4-440b-a854-d98e31863eba" />
+
+### **Step 2: Input Processing (Controller Layer)**
+
+  * **File:** `ChangePasswordController.java`
+  * **Method:** `doPost(HttpServletRequest request, ...)`
+  * **Action:**
+    1.  **Session Check:** Ensures the session is still valid.
+    2.  **Input Retrieval:** Gets `currentPassword`, `newPassword`, and `confirmPassword` from the form.
+    3.  **Validation:**
+          * Checks for null/empty fields.
+          * Checks if `newPassword` length \< 6 characters.
+          * Checks if `newPassword` matches `confirmPassword`.
+
+### **Step 3: Security Verification (Controller Logic)**
+
+Before updating, the system must verify the user's identity again.
+
+  * **Action:**
+    1.  Retrieves the latest user data from the database using `userDAO.getUserById()`.
+    2.  **Verify Old Password:** Uses `BCrypt.checkpw(currentInput, dbHash)` to ensure the user knows their current password.
+    3.  **Hash New Password:** Generates a new salt and hash using `BCrypt.hashpw(newPassword, BCrypt.gensalt())`.
+
+### **Step 4: Database Update (Model Layer)**
+
+  * **File:** `UserDAO.java`
+  * **Method:** `updatePassword(int userId, String newHashedPassword)`
+  * **Action:** Executes the SQL Update query:
+    ```sql
+    UPDATE users SET password = ? WHERE id = ?
+    ```
+  * **Result:**
+      * **Success:** Controller sets a success message attribute and reloads the page.
+      * **Failure:** Controller sets an error message.
+
+<img width="1079" height="1087" alt="image" src="https://github.com/user-attachments/assets/4465dc3c-39f0-4cb3-a394-aa64ae45f3ac" />
+<img width="1087" height="1099" alt="image" src="https://github.com/user-attachments/assets/490daea2-69f1-4d58-b2b7-0bcf3ed710f2" />
+
