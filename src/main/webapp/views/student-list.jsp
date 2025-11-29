@@ -63,9 +63,7 @@
 <div class="navbar">
     <h3>📚 Student Management</h3>
     <div class="nav-links">
-        <c:if test="${sessionScope.role == 'admin'}">
-            <a href="dashboard" class="nav-item">📊 Dashboard</a>
-        </c:if>
+        <a href="dashboard" class="nav-item">📊 Dashboard</a>
         <div class="user-badge">👤 ${sessionScope.fullName}</div>
         <a href="logout" class="btn-logout">Logout</a>
     </div>
